@@ -15,6 +15,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
   var updateTime = 0.0;
+  var _move = 0.0;
+  var _stop = 0.0;
 
   @override
   void initState() {
@@ -27,21 +29,58 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<FragmentProgram>(
-      future: _initShader(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final shader = snapshot.data!.fragmentShader()
-            ..setFloat(0, updateTime)
-            ..setFloat(1, 300)
-            ..setFloat(2, 300);
-          return CustomPaint(painter: _MySweepPainter(shader));
-        } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      },
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: FutureBuilder<FragmentProgram>(
+          future: _initShader(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final shader = snapshot.data!.fragmentShader()
+                ..setFloat(0, updateTime)
+                ..setFloat(1, 300)
+                ..setFloat(2, 300)
+                ..setFloat(3, _move)
+                ..setFloat(4, _stop);
+              return Stack(
+                children: [
+                  CustomPaint(painter: _MySweepPainter(shader)),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        if (_move == 1) {
+                          _move = 0.0;
+                        } else {
+                          _move = 1;
+                        }
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: FloatingActionButton(
+                      onPressed: () {
+                        if (_stop == 1) {
+                          _stop = 0.0;
+                        } else {
+                          _stop = 1;
+                        }
+                        setState(() {});
+                      },
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 
