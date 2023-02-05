@@ -27,6 +27,7 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
     }).start();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,42 +37,22 @@ class _MyAppState extends State<MyApp> with TickerProviderStateMixin {
           future: _initShader(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final shader = snapshot.data!.fragmentShader()
-                ..setFloat(0, updateTime)
-                ..setFloat(1, 300)
-                ..setFloat(2, 300)
-                ..setFloat(3, _move)
-                ..setFloat(4, _stop);
-              return Stack(
-                children: [
-                  CustomPaint(painter: _MySweepPainter(shader)),
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        if (_move == 1) {
-                          _move = 0.0;
-                        } else {
-                          _move = 1;
-                        }
-                        setState(() {});
-                      },
-                    ),
+              return ShaderMask(
+                shaderCallback: (bounds) {
+                  return snapshot.data!.fragmentShader()
+                    ..setFloat(0, updateTime)
+                    ..setFloat(1, bounds.height)
+                    ..setFloat(2, bounds.width);
+                },
+                child: const Center(
+                    child: Text(
+                  "TEST",
+                  style: TextStyle(
+                    fontSize: 150,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
                   ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      onPressed: () {
-                        if (_stop == 1) {
-                          _stop = 0.0;
-                        } else {
-                          _stop = 1;
-                        }
-                        setState(() {});
-                      },
-                    ),
-                  ),
-                ],
+                )),
               );
             } else {
               return const Center(
